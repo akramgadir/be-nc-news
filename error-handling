@@ -1,0 +1,23 @@
+exports.handleCustomErrors = (err, req, res, next) => {
+  console.log("Entered custom errors:", err);
+  if (err.status) {
+    const { status, message } = err;
+    res.status(status).send({ message });
+  } else next(err); //this tells it if the if doesnt catch it, go to next 4 argument function (which is psql errors)
+};
+
+exports.handlePSQLErrors = (err, req, res, next) => {
+  console.log("Entered PSQL errors:", err.code);
+  if (err.code === "22P02") {
+    res.status(400).send({ message: "PSQL error" });
+  } else {
+    next(err);
+  }
+};
+
+//keep at the end in the app.js
+exports.handle500Errors = (err, req, res, next) => {
+  console.log("Entered handle500Errors function:", err);
+  const { status = 500, message = "Internal server error" } = err;
+  res.status(status).send({ message });
+};
