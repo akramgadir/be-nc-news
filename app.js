@@ -5,8 +5,14 @@ const {
   getArticleById,
 } = require("./controllers/topics.controllers.js");
 const endpoints = require("./endpoints.json");
-
+//ONCE PR IS APPROVED, MERGE ON GITHUB CHECKECOUT TO MAIN BRANCH AND THEN PULL
+//MAKE THE NEW BRANCH FIRST THING AKRAM 4
 const app = express();
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).send("Server Error!");
+});
 
 // check api is running ok
 // app.get("/api/topics", (req, res) => {
@@ -17,10 +23,6 @@ app.get("/api/topics", getTopics);
 
 app.get("/api", (req, res, next) => {
   res.json(endpoints);
-});
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
 });
 
 module.exports = app;

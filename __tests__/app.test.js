@@ -3,12 +3,9 @@ const request = require("supertest");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index");
-const devData = require("../db/data/development-data/index.js");
 
-const { toLocaleString } = require("../db/data/development-data/articles.js");
 beforeAll(() => seed(data));
 afterAll(() => db.end());
-const availableRoutes = require("../app.js");
 
 describe("GET /api/topics", () => {
   test("returns 200 status code", () => {
@@ -19,12 +16,7 @@ describe("GET /api/topics", () => {
     return request(app)
       .get("/api/topics")
       .then(({ body, status }) => {
-        if (status === 404) {
-          console.log("Error", status);
-        }
-        if (status === 500) {
-          console.log("Internal server error", status);
-        }
+        expect(body.topics.length).toBe(3);
         body.topics.forEach((topic) => {
           expect(topic).toHaveProperty("description");
           expect(topic).toHaveProperty("slug");
@@ -35,21 +27,6 @@ describe("GET /api/topics", () => {
       });
   });
 });
-
-// describe("GET /api", () => {
-//   //   test("returns 200 status code", () => {
-//   //     return request(app).get("/api").expect(200);
-//   //   });
-
-//   test("returns an object describing all the available endpoints on your API", () => {
-//     return request(app)
-//       .get("/api/")
-//       .then(({ body }) => {
-//         console.log(body);
-
-//       });
-//   });
-// });
 
 describe("GET /api", () => {
   test("responds with a JSON object containing descriptions for each endpoint", () => {

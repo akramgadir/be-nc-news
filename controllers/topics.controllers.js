@@ -1,8 +1,7 @@
 const { fetchTopics } = require("../models/topics.models");
 
-fetchTopics;
 exports.getTopics = (req, res) => {
-  fetchTopics(req.query)
+  fetchTopics()
     .then((topics) => {
       //   console.log(topics);
       res.status(200).send({ topics });
