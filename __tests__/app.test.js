@@ -85,3 +85,50 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("GET /api/articles", () => {
+  test("returns 200 status code", () => {
+    return request(app).get("/api/articles").expect(200);
+  });
+
+  test("returns an array of articles objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .then(({ body, status }) => {
+        // expect(body.articles.length).toBe(13);
+        console.log("articles body test:", body);
+        body.articles.forEach((article) => {
+          expect(typeof article).toBe("object");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.article_img_url).toBe("string");
+        });
+        expect(body.articles[0].title).toBe(
+          "Eight pug gifs that remind me of mitch"
+        );
+      });
+  });
+
+  test("should add comment count property and sort articles in descending date order and remove the body property from each article ", () => {
+    return request(app)
+      .get("/api/articles")
+      .then(({ body, status }) => {
+        console.log("test17", body.articles);
+        expect(body.articles[0].comment_count).toBe("2");
+        expect(body.articles[1].comment_count).toBe("1");
+
+        expect(body.articles[0].created_at).toBe("2020-11-03T09:12:00.000Z");
+        expect(body.articles[1].created_at).toBe("2020-10-18T01:00:00.000Z");
+        expect(body.articles[2].created_at).toBe("2020-10-16T05:03:00.000Z");
+        expect(body.articles[3].created_at).toBe("2020-10-11T11:24:00.000Z");
+
+        body.articles.forEach((article) => {
+          expect(article).toHaveProperty("comment_count");
+          expect(article).not.toHaveProperty("body");
+        });
+      });
+  });
+});

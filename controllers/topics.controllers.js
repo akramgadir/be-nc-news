@@ -1,4 +1,8 @@
-const { fetchTopics, fetchArticleById } = require("../models/topics.models");
+const {
+  fetchTopics,
+  fetchArticleById,
+  fetchArticles,
+} = require("../models/topics.models");
 
 exports.getTopics = (req, res, next) => {
   fetchTopics()
@@ -21,6 +25,16 @@ exports.getArticleById = (req, res, next) => {
       //if someone does an incorrect sql query in models it goes here bc it throws an sql error
       console.log("test3", err);
 
+      next(err);
+    });
+};
+
+exports.getArticles = (req, res, next) => {
+  fetchArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
       next(err);
     });
 };
