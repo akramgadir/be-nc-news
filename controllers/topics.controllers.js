@@ -2,6 +2,7 @@ const {
   fetchTopics,
   fetchArticleById,
   fetchArticles,
+  fetchCommentsByArticleId,
 } = require("../models/topics.models");
 
 exports.getTopics = (req, res, next) => {
@@ -19,7 +20,7 @@ exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleById(article_id)
     .then((articles) => {
-      res.status(200).send({ articles }); //whenw ere ready to send something to the user use res.status
+      res.status(200).send({ articles }); //when were ready to send something to the user use res.status
     })
     .catch((err) => {
       //if someone does an incorrect sql query in models it goes here bc it throws an sql error
@@ -33,6 +34,17 @@ exports.getArticles = (req, res, next) => {
   fetchArticles()
     .then((articles) => {
       res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getCommentsByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  fetchCommentsByArticleId(article_id)
+    .then((comments) => {
+      res.status(200).send({ comments });
     })
     .catch((err) => {
       next(err);

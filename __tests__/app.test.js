@@ -96,7 +96,6 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .then(({ body, status }) => {
         // expect(body.articles.length).toBe(13);
-        console.log("articles body test:", body);
         body.articles.forEach((article) => {
           expect(typeof article).toBe("object");
           expect(typeof article.title).toBe("string");
@@ -129,6 +128,34 @@ describe("GET /api/articles", () => {
           expect(article).toHaveProperty("comment_count");
           expect(article).not.toHaveProperty("body");
         });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("returns 200 status code", () => {
+    return request(app).get("/api/articles/3/comments").expect(200);
+  });
+
+  test("returns 500 status code when given an invalid id", () => {
+    return request(app).get("/api/articles/2000/comments").expect(500);
+  });
+
+  test("returns 500 status code when given an invalid id", () => {
+    return request(app).get("/api/articles/2/comments").expect(500);
+  });
+
+  test("should make sure each comment has the correct properties", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .then((res) => {
+        const comment = res.body.comments[0];
+
+        expect(comment.comment_id).toBe(11);
+        expect(comment.votes).toBe(0);
+        expect(comment.created_at).toBe("2020-09-19T23:10:00.000Z");
+        expect(comment.body).toBe("Ambidextrous marsupial");
+        expect(comment.article_id).toBe(3);
       });
   });
 });

@@ -14,10 +14,10 @@ exports.fetchArticleById = (id) => {
   let query = `SELECT * FROM articles WHERE article_id=$1;`;
   const articles = db.query(query, [id]).then((result) => {
     if (result.rowCount === 0) {
-      console.log("models failed");
+      // console.log("models failed");
       return Promise.reject({ status: 404, message: "not found" });
     } else {
-      console.log("models passed");
+      // console.log("models passed");
       return result.rows[0];
     }
   });
@@ -35,8 +35,33 @@ exports.fetchArticles = () => {
   `;
   return db.query(query).then(({ rows }) => {
     rows.forEach((article) => {
-      delete article.body; // remove body property
+      delete article.body;
     });
     return rows;
   });
+};
+
+exports.fetchCommentsByArticleId = (article_id) => {
+  return db
+    .query(
+      `
+      SELECT comments.comment_id, comments.votes, comments.created_at, comments.author, comments.body, comments.article_id 
+      FROM comments 
+      WHERE comments.article_id = \$1
+      ORDER BY comments.created_at DESC;
+    `,
+      [article_id]
+    )
+    .then((result) => {
+      if (result.rowCount === 0) {
+        // console.log("models failed");
+        return Promise.reject({
+          status: 500,
+          message: "Internal Server Error",
+        });
+      } else {
+        // console.log("models passed");
+        return result.rows;
+      }
+    });
 };
