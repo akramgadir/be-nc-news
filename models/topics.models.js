@@ -47,7 +47,7 @@ exports.fetchCommentsByArticleId = (article_id) => {
       `
       SELECT comments.comment_id, comments.votes, comments.created_at, comments.author, comments.body, comments.article_id 
       FROM comments 
-      WHERE comments.article_id = \$1
+      WHERE comments.article_id = $1
       ORDER BY comments.created_at DESC;
     `,
       [article_id]
@@ -56,8 +56,8 @@ exports.fetchCommentsByArticleId = (article_id) => {
       if (result.rowCount === 0) {
         // console.log("models failed");
         return Promise.reject({
-          status: 500,
-          message: "Internal Server Error",
+          status: 404,
+          message: "Not found",
         });
       } else {
         // console.log("models passed");

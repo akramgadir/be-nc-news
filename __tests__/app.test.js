@@ -115,7 +115,6 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .then(({ body, status }) => {
-        console.log("test17", body.articles);
         expect(body.articles[0].comment_count).toBe("2");
         expect(body.articles[1].comment_count).toBe("1");
 
@@ -137,12 +136,15 @@ describe("GET /api/articles/:article_id/comments", () => {
     return request(app).get("/api/articles/3/comments").expect(200);
   });
 
-  test("returns 500 status code when given an invalid id", () => {
-    return request(app).get("/api/articles/2000/comments").expect(500);
+  test("returns 404 status code when given an invalid id", () => {
+    return request(app).get("/api/articles/2000/comments").expect(404);
   });
 
-  test("returns 500 status code when given an invalid id", () => {
-    return request(app).get("/api/articles/2/comments").expect(500);
+  test("returns 404 status code when given an invalid id", () => {
+    return request(app).get("/api/articles/2/comments").expect(404);
+  });
+  test("returns 400 status code when given an invalid id", () => {
+    return request(app).get("/api/articles/banana/comments").expect(400);
   });
 
   test("should make sure each comment has the correct properties", () => {
