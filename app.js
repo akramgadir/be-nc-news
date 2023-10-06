@@ -3,6 +3,8 @@ const {
   getTopics,
   getArticles,
   getArticleById,
+  getCommentsByArticleId,
+  getUsers,
 } = require("./controllers/topics.controllers.js");
 const endpoints = require("./endpoints.json");
 const {
@@ -24,6 +26,13 @@ app.get("/api", (req, res, next) => {
 });
 
 app.get("/api/articles/:article_id", getArticleById);
+
+app.get("/api/articles", getArticles);
+//add property of: comment_count, which is the total count of all the comments with this article_id. You should make use of queries to the database in order to achieve this.
+
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+
+app.get("/api/users", getUsers);
 
 app.use(handleCustomErrors);
 app.use(handlePSQLErrors);
