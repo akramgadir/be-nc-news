@@ -161,3 +161,23 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("returns 200 status code", () => {
+    return request(app).get("/api/users").expect(200);
+  });
+
+  test("returns an array of topic objects", () => {
+    return request(app)
+      .get("/api/users")
+      .then(({ body, status }) => {
+        expect(body.users.length).toBe(4);
+        body.users.forEach((user) => {
+          expect(typeof user).toBe("object");
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+});

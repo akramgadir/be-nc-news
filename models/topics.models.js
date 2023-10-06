@@ -65,3 +65,11 @@ exports.fetchCommentsByArticleId = (article_id) => {
       }
     });
 };
+
+exports.fetchUsers = () => {
+  //   console.log("you are in models");
+  return db.query(`SELECT * FROM users;`).then(({ rows }) => {
+    //deconstructing rows from the results object
+    return rows;
+  });
+};
