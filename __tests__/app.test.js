@@ -181,3 +181,16 @@ describe("GET /api/users", () => {
       });
   });
 });
+describe("GET /api/articles?topic=...", () => {
+  test("returns 200 status code and articles with a specific topic when topic query parameter is given", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        expect(Array.isArray(response.body.articles)).toBe(true);
+        response.body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+});

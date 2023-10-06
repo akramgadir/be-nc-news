@@ -31,4 +31,11 @@
       "description": "Get all comments for an article. Responds with an array of comments for the given article_id, each with the following properties: comment_id, votes, created_at, author, body, article_id. Comments are served with the most recent comments first."
     }
   }
+  ,
+    "/api/users": {
+      "GET": {
+        "description": "Get all users. Responds with an array of users, each with the following properties: username, name, avatar_url."
+      }
+    }
+
 }

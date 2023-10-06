@@ -32,7 +32,8 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  fetchArticles()
+  const { topic } = req.query;
+  fetchArticles(topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -55,7 +56,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.getUsers = (req, res, next) => {
   fetchUsers()
     .then((users) => {
-      //   console.log(topics);
       res.status(200).send({ users });
     })
     .catch((err) => {

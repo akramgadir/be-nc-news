@@ -24,8 +24,22 @@ exports.fetchArticleById = (id) => {
   console.log(articles);
   return articles;
 };
+exports.fetchArticles = (topic) => {
+  let query = `SELECT * FROM articles`;
+  let params = [];
+  if (topic) {
+    query += ` WHERE articles.topic = \$1`;
+    params.push(topic);
+  }
+  return db.query(query, params).then(({ rows }) => {
+    return rows;
+  });
+};
 
-exports.fetchArticles = () => {
+exports.fetchArticles = (topic) => {
+  let params = [];
+  console.log(topic, "topic in models");
+
   let query = `
     SELECT articles.*, COUNT(comments.comment_id) AS comment_count
     FROM articles
@@ -33,7 +47,20 @@ exports.fetchArticles = () => {
     GROUP BY articles.article_id
     ORDER BY articles.created_at DESC;
   `;
-  return db.query(query).then(({ rows }) => {
+  if (topic) {
+    console.log("articles models topic entered!!");
+    query = `
+    SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    WHERE articles.topic = $1
+    GROUP BY articles.article_id
+    ORDER BY articles.created_at DESC;
+  `;
+    params.push(topic);
+  }
+
+  return db.query(query, params).then(({ rows }) => {
     rows.forEach((article) => {
       delete article.body;
     });
