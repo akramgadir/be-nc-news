@@ -25,17 +25,36 @@
       ]
     }
   },
-
+  "/api/articles/:article_id": {
+    "GET": {
+      "description": "Get an article by its id"
+    },
+    "PUT": {
+      "description": "Update an article by its id"
+    },
+    "DELETE": {
+      "description": "Delete an article by its id"
+    }
+  },
   "/api/articles/:article_id/comments": {
     "GET": {
       "description": "Get all comments for an article. Responds with an array of comments for the given article_id, each with the following properties: comment_id, votes, created_at, author, body, article_id. Comments are served with the most recent comments first."
-    }
-  }
-  ,
-    "/api/users": {
+    },
+    "POST": {
+      "description": "Add a comment to an article"
+    },
+    "/api/articles/:article_id/comments/:comment_id": {
       "GET": {
-        "description": "Get all users. Responds with an array of users, each with the following properties: username, name, avatar_url."
+        "description": "Get a comment by its id"
+      },
+      "DELETE": {
+        "description": "Delete a comment by its id"
       }
     }
-
+  },
+  "/api/users": {
+    "GET": {
+      "description": "Get all users. Responds with an array of users, each with the following properties: username, name, avatar_url."
+    }
+  }
 }

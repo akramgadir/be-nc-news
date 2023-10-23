@@ -5,6 +5,10 @@ const {
   getArticleById,
   getCommentsByArticleId,
   getUsers,
+  addComment,
+  deleteComment,
+  updateArticle,
+  postComment,
 } = require("./controllers/topics.controllers.js");
 const endpoints = require("./endpoints.json");
 const {
@@ -13,6 +17,11 @@ const {
   handlePSQLErrors,
 } = require("./error-handling");
 const app = express();
+const cors = require("cors");
+
+app.use(cors());
+// app.use(express.urlencoded({ extended: false }));
+app.use(express.json()); //needed for post requests
 
 // check api is running ok
 // app.get("/api/topics", (req, res) => {
@@ -33,6 +42,13 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api/users", getUsers);
+
+// app.post("/api/articles/:article_id/comments", addComment);
+app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", updateArticle);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use(handleCustomErrors);
 app.use(handlePSQLErrors);

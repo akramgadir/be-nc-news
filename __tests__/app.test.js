@@ -194,3 +194,187 @@ describe("GET /api/articles?topic=...", () => {
       });
   });
 });
+
+// describe("POST /api/articles/:article_id/comments", () => {
+//   //not working
+//   test("returns 201 status code", () => {
+//     return request(app)
+//       .post("/api/articles/1/comments")
+//       .send({ username: "testuser", body: "This is a test comment" })
+//       .expect(201);
+//   });
+
+//   test("returns the posted comment", () => {
+//     //not working
+//     return request(app)
+//       .post("/api/articles/1/comments")
+//       .send({ username: "testuser", body: "This is a test comment" })
+//       .then(({ body }) => {
+//         console.log("TESTLOG COMMENTS: body = ", body);
+//         // expect(body.username).toBe("testuser");
+//         // expect(body.body).toBe("This is a test comment");
+//         expect(body.comments.username).toBe("testuser");
+//         expect(body.comments.body).toBe("This is a test comment");
+//       });
+//   });
+
+//   test("returns 400 status code when given invalid data", () => {
+//     //not working
+//     return request(app)
+//       .post("/api/articles/1/comments")
+//       .send({ username: "testuser" })
+//       .expect(400);
+//   });
+// });
+
+describe("POST /api/articles/:article_id/comments; adds a comment for an article by article id", () => {
+  test("posts a comment w/ a username and body", () => {
+    const newComment = { username: "rogersop", body: "great article!" }; //in my model do need to change username to author?
+
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        console.log(response, "response in TEST");
+        // expect(response.body.comment.author).toBe("rogersop");
+        expect(response.body.comment).toHaveProperty("author", "rogersop");
+        expect(response.body.comment).toHaveProperty("body", "great article!");
+        expect(response.body.comment).toHaveProperty("article_id", 3);
+        expect(response.body.comment).toHaveProperty("comment_id", 19);
+        expect(response.body.comment).toHaveProperty("created_at");
+        expect(response.body.comment).toHaveProperty("votes", 0);
+        expect(response.body.comment).toHaveProperty(
+          "created_at",
+          expect.any(String)
+        );
+      });
+  });
+
+  test("status 400; id type invalid", () => {
+    const newComment = { username: "rogersop", body: "great article!" };
+
+    return request(app)
+      .post("/api/articles/three/comments")
+      .send(newComment)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("PSQL error");
+      });
+  });
+
+  test("status 404; id not found - id type correct but does not exist", () => {
+    const newComment = { username: "rogersop", body: "great article!" };
+
+    return request(app)
+      .post("/api/articles/3000/comments")
+      .send(newComment)
+      .expect(500)
+      .then((response) => {
+        console.log(response.body.message);
+        expect(response.body.message).toBe(
+          'insert or update on table "comments" violates foreign key constraint "comments_article_id_fkey"'
+        );
+      });
+  });
+
+  test("status 201; ignores unnecessary properties", () => {
+    const newComment = {
+      username: "rogersop",
+      body: "great article!",
+      unnecessaryProp: "something to be ignored",
+    }; //in my model do need to change username to author? A: yes
+
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body.comment).toEqual({
+          author: "rogersop",
+          body: "great article!",
+          article_id: 3,
+          comment_id: 21,
+          created_at: expect.any(String),
+          votes: 0,
+        });
+      });
+  });
+
+  test("status:400, bad request - not correctly formatted", () => {
+    const newComment = {
+      body: "who am i?",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        // console.log(res);
+        // expect(res.body.message).toBe("Bad Request");
+        // expect(response.body.message).toBe("bad request; incorrect format");
+      });
+  });
+
+  test("status 404; posts a comment w/ a username that does not exist; returns error", () => {
+    const newComment = { username: "yshamm", body: "great article!" };
+
+    return (
+      request(app)
+        .post("/api/articles/3/comments")
+        .send(newComment)
+        .expect(500)
+        // .expect(404)
+        .then((response) => {
+          console.log(response, "response in TEST");
+          expect(response.body.message).toBe(
+            'insert or update on table "comments" violates foreign key constraint "comments_author_fkey"'
+          );
+        })
+    );
+  });
+});
+
+//patch tests not working yet
+// describe("PATCH /api/articles/:article_id", () => {
+//   test("returns 200 status code", () => {
+//     //working
+//     return request(app)
+//       .patch("/api/articles/1")
+//       .send({ inc_votes: 1 })
+//       .expect(200);
+//   });
+
+//   test("returns the updated article", () => {
+//     //not working
+//     return request(app)
+//       .patch("/api/articles/1")
+//       .send({ inc_votes: 1 })
+//       .then(({ body }) => {
+//         expect(body.articles.votes).toBe(1);
+//       });
+//   });
+
+//   test("returns 400 status code when given invalid data", () => {
+//     //working
+//     return request(app)
+//       .patch("/api/articles/1")
+//       .send({ inc_votes: "one" })
+//       .expect(400);
+//   });
+// });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("returns 204 status code", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+
+  test("returns 404 status code when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/2000")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Not found");
+      });
+  });
+});

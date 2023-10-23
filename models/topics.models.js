@@ -100,3 +100,63 @@ exports.fetchUsers = () => {
     return rows;
   });
 };
+
+exports.addCommentById = (id, username, body) => {
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      msg: "bad request; incorrect format",
+    });
+  } else {
+    return db
+      .query(
+        `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *;`, //can't use %L here. need to use $ syntax
+        [body, username, id]
+      )
+      .then((response) => {
+        //console.log(response.rows, "response in MODEL");   //this custom error didnt work. used psql error handler instead.
+        //   if (response.rows.length === 0) {
+        //     return Promise.reject({
+        //       status: 404,
+        //       msg: "article id not found",
+        //     });
+        //   } else {
+        return response.rows[0];
+        //  }
+      });
+  }
+};
+
+// exports.insertComment = (newComment) => {
+//   const { username, body, article_id } = newComment;
+//   return db
+//     .query(
+//       "INSERT INTO comments (username, body, article_id) VALUES ($1, $2, $3) RETURNING *;",
+//       [username, body, article_id]
+//     )
+//     .then(({ rows }) => rows[0]);
+// };
+
+//
+
+//might need to add ALTER TABLE comments ADD COLUMN username VARCHAR(255);
+
+// //delete this it didnt work
+// exports.addComment = (req, res, next) => {
+//   console.log("COMMENT TEST: req.body = ", req.body);
+//   const { article_id } = req.params;
+//   const { username, body } = req.body; //returning undefined
+//   const query = `
+//     INSERT INTO comments (username, body, article_id)
+//     VALUES (\$1, \$2, \$3)
+//     RETURNING *;
+//   `;
+
+//   db.query(query, [username, body, article_id])
+//     .then((result) => {
+//       res.status(201).send({ comments: result.rows[0] });
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
