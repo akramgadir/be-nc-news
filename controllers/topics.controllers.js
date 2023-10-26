@@ -4,8 +4,8 @@ const {
   fetchArticles,
   fetchCommentsByArticleId,
   fetchUsers,
-  insertComment,
   addCommentById,
+  updateArticleVotes,
 } = require("../models/topics.models");
 
 const db = require("../db/connection.js");
@@ -67,19 +67,6 @@ exports.getUsers = (req, res, next) => {
     });
 };
 
-// exports.addComment = (req, res, next) => {
-//   console.log("controllers add comment test: ", req.body);
-//   if (!req.body) {
-//     return res.status(400).send({ error: "Bad Request: Missing request body" });
-//   }
-
-//   insertComment(req.body)
-//     .then((comment) => res.status(201).send({ comments: comment }))
-//     .catch((err) => {
-//       next(err);
-//     });
-// };
-
 exports.postComment = (request, response, next) => {
   //console.log(request.body, "request in CONTROLLER");
   const id = request.params.article_id;
@@ -95,33 +82,46 @@ exports.postComment = (request, response, next) => {
     });
 };
 
-exports.updateArticle = (req, res, next) => {
-  const { article_id } = req.params;
-  const { inc_votes } = req.body;
-
-  if (!inc_votes) {
-    return res.status(400).send({ error: "Bad Request: Missing inc_votes" });
-  }
-
-  const query = `
-    UPDATE articles
-    SET votes = votes + \$1
-    WHERE article_id = \$2
-    RETURNING *;
-  `;
-
-  db.query(query, [inc_votes, article_id])
-    .then((result) => {
-      if (result.rowCount === 0) {
-        return Promise.reject({ status: 404, message: "Not found" });
-      } else {
-        res.status(200).send({ articles: result.rows[0] });
-      }
+exports.patchArticleById = (request, response, next) => {
+  const id = request.params.article_id;
+  const inc_votes = request.body.inc_votes;
+  updateArticleVotes(id, inc_votes)
+    .then((article) => {
+      console.log("article in patch!: ", article);
+      response.status(200).send({ article: article });
     })
     .catch((err) => {
       next(err);
     });
 };
+
+// exports.updateArticle = (req, res, next) => {
+//   const { article_id } = req.params;
+//   const { inc_votes } = req.body;
+
+//   if (!inc_votes) {
+//     return res.status(400).send({ error: "Bad Request: Missing inc_votes" });
+//   }
+
+//   const query = `
+//     UPDATE articles
+//     SET votes = votes + \$1
+//     WHERE article_id = \$2
+//     RETURNING *;
+//   `;
+
+//   db.query(query, [inc_votes, article_id])
+//     .then((result) => {
+//       if (result.rowCount === 0) {
+//         return Promise.reject({ status: 404, message: "Not found" });
+//       } else {
+//         res.status(200).send({ articles: result.rows[0] });
+//       }
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 
 exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;

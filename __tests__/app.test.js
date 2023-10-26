@@ -335,35 +335,77 @@ describe("POST /api/articles/:article_id/comments; adds a comment for an article
   });
 });
 
-//patch tests not working yet
-// describe("PATCH /api/articles/:article_id", () => {
-//   test("returns 200 status code", () => {
-//     //working
-//     return request(app)
-//       .patch("/api/articles/1")
-//       .send({ inc_votes: 1 })
-//       .expect(200);
-//   });
+//patch tests
+describe("PATCH /api/articles/:article_id", () => {
+  //pass
+  test("vote up an article", () => {
+    const newVotes = { inc_votes: 10 };
 
-//   test("returns the updated article", () => {
-//     //not working
-//     return request(app)
-//       .patch("/api/articles/1")
-//       .send({ inc_votes: 1 })
-//       .then(({ body }) => {
-//         expect(body.articles.votes).toBe(1);
-//       });
-//   });
+    return request(app)
+      .patch("/api/articles/3")
+      .send(newVotes)
+      .expect(200)
+      .then((response) => {
+        console.log(response.body, "res in TEST");
+        expect(response.body.article).toEqual({
+          article_id: 3,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
+          created_at: "2020-11-03T09:12:00.000Z",
+          votes: 10,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+        expect(response.body.article.votes).toBe(10);
+      });
+  });
+  //FAIL
+  test("status 400; bad request, invalid data type", () => {
+    const newVotes = { inc_votes: "ten" };
 
-//   test("returns 400 status code when given invalid data", () => {
-//     //working
-//     return request(app)
-//       .patch("/api/articles/1")
-//       .send({ inc_votes: "one" })
-//       .expect(400);
-//   });
-// });
-
+    return request(app)
+      .patch("/api/articles/3")
+      .send(newVotes)
+      .expect(400)
+      .then((response) => {
+        console.log(response.body.message, "err msg in TEST");
+        expect(response.body.message).toBe("PSQL error");
+      });
+  });
+  //pass
+  test("status 400; bad request, empty object", () => {
+    const newVotes = {};
+    return request(app)
+      .patch(`/api/articles/3`)
+      .send(newVotes)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe("no change in vote");
+      });
+  });
+  //pass
+  test("status:404, correct data type but id does not exist to update ", () => {
+    return request(app)
+      .patch(`/api/articles/99999`)
+      .send({ inc_votes: 10 })
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe("article id not found");
+      });
+  });
+  //pass
+  test("status: 400, invalid Id not a number cant patch wrong data type", () => {
+    return request(app)
+      .patch(`/api/articles/not-an-id`)
+      .send({ inc_votes: 10 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("PSQL error");
+      });
+  });
+});
 describe("DELETE /api/comments/:comment_id", () => {
   test("returns 204 status code", () => {
     return request(app).delete("/api/comments/1").expect(204);

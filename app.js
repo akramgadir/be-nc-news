@@ -5,10 +5,9 @@ const {
   getArticleById,
   getCommentsByArticleId,
   getUsers,
-  addComment,
   deleteComment,
-  updateArticle,
   postComment,
+  patchArticleById,
 } = require("./controllers/topics.controllers.js");
 const endpoints = require("./endpoints.json");
 const {
@@ -46,7 +45,7 @@ app.get("/api/users", getUsers);
 // app.post("/api/articles/:article_id/comments", addComment);
 app.post("/api/articles/:article_id/comments", postComment);
 
-app.patch("/api/articles/:article_id", updateArticle);
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteComment);
 

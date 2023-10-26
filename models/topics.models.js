@@ -105,7 +105,7 @@ exports.addCommentById = (id, username, body) => {
   if (!username || !body) {
     return Promise.reject({
       status: 400,
-      msg: "bad request; incorrect format",
+      message: "bad request; incorrect format",
     });
   } else {
     return db
@@ -118,11 +118,37 @@ exports.addCommentById = (id, username, body) => {
         //   if (response.rows.length === 0) {
         //     return Promise.reject({
         //       status: 404,
-        //       msg: "article id not found",
+        //       message: "article id not found",
         //     });
         //   } else {
         return response.rows[0];
         //  }
+      });
+  }
+};
+
+exports.updateArticleVotes = (id, inc_votes) => {
+  console.log(id, "id in MODEL");
+  if (!inc_votes) {
+    return Promise.reject({
+      status: 400,
+      message: "no change in vote",
+    });
+  } else {
+    return db
+      .query(
+        `UPDATE articles SET votes=votes + $2 WHERE article_id = $1 RETURNING *;`,
+        [id, inc_votes]
+      )
+      .then((response) => {
+        if (response.rows.length === 0) {
+          return Promise.reject({
+            status: 404,
+            message: "article id not found",
+          });
+        }
+        console.log("response rows 0 in updateArticleVotes", response.rows[0]);
+        return response.rows[0];
       });
   }
 };
